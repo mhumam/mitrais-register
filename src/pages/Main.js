@@ -16,12 +16,18 @@ const openNotificationWithIcon = (type, message, description) => {
 
 class App extends Component {
   state = {
-    show: true
+    show: true,
+    page: 'login'
   };
+
   onClick = () => {
     this.setState({
       show: !this.state.show
     });
+  }
+
+  switchToPage = (page) => {
+    this.setState({ page });
   }
 
   render() {
@@ -34,14 +40,16 @@ class App extends Component {
               <Col xs={24} sm={24} md={24} lg={24} xl={24}>
                 <img src="/assets/images/background-login-2.jpg" alt="Mitrais" className="background-login" />
                 <QueueAnim className="demo-content">
-                  {this.state.show ?
-                    <Row key="login-page">
-                      <Login switchPage={this.onClick} />
-                    </Row>
-                    :
-                    <Row key="signup-page">
-                      <SignUp switchPage={this.onClick} />
-                    </Row>}
+                  {
+                    (this.state.page === 'login') ?
+                      <Row key="login-page">
+                        <Login switchToPage={this.switchToPage} />
+                      </Row> :
+                      (this.state.page === 'signup') ?
+                        <Row key="signup-page">
+                          <SignUp switchToPage={this.switchToPage} />
+                        </Row> : <HomePage switchToPage={this.switchToPage} />
+                  }
                 </QueueAnim>
               </Col>
             </Row>
@@ -68,7 +76,7 @@ class SignUp extends Component {
     this.setState({ isLoading: true });
 
     /* callback switch page */
-    const callback = () => { this.props.switchPage() }
+    const callback = () => { this.props.switchToPage('login') }
 
     await axios.post('https://apimitrais.herokuapp.com/api/register', { ...values })
       .then(function (response) {
@@ -129,7 +137,7 @@ class SignUp extends Component {
                 Register
               </Button>
               &nbsp;
-              <Button htmlType="button" block className="btn-mitrais">
+              <Button htmlType="button" block className="btn-mitrais" onClick={() => this.props.switchToPage('login')}>
                 Back
               </Button>
             </Form>
@@ -141,6 +149,10 @@ class SignUp extends Component {
 }
 
 class Login extends Component {
+  onFinish = values => {
+    this.props.switchToPage('homepage');
+  }
+
   render() {
     return (
       <Col xs={24} sm={24} md={{ span: 8, offset: 8 }} lg={{ span: 8, offset: 8 }} xl={{ span: 8, offset: 8 }} style={{ marginTop: '100px' }}>
@@ -151,31 +163,47 @@ class Login extends Component {
             layout="vertical"
             name="basic"
             initialValues={{ remember: true }}
+            onFinish={this.onFinish}
           >
             <Form.Item
-              label="Username"
-              name="username"
-              rules={[{ required: true, message: 'Please input your username!' }]}
+              label="Email"
+              name="email"
+              rules={[
+                { required: true, message: 'Please input your email!' },
+                { type: 'email', message: 'Format email invalid' }]}
             >
               <Input />
-            </Form.Item>
-            <Form.Item
-              label="Password"
-              name="password"
-              rules={[{ required: true, message: 'Please input your password!' }]}
-            >
-              <Input.Password />
             </Form.Item>
             <Form.Item >
               <Button type="primary" htmlType="submit" block className="btn-mitrais">
                 Submit
-                          </Button>
+              </Button>
               <Divider>OR</Divider>
-              <Button type="primary" htmlType="button" onClick={this.props.switchPage} block className="btn-mitrais">
+              <Button type="primary" htmlType="button" onClick={() => this.props.switchToPage('signup')} block className="btn-mitrais">
                 Sign Up
-                          </Button>
+              </Button>
             </Form.Item>
           </Form>
+        </div>
+      </Col>
+    )
+  }
+}
+
+class HomePage extends Component {
+  render() {
+    return (
+      <Col xs={24} sm={24} md={{ span: 8, offset: 8 }} lg={{ span: 8, offset: 8 }} xl={{ span: 8, offset: 8 }} style={{ marginTop: '100px' }}>
+        <div className="box-login">
+          <img src="/assets/images/mitrais-logo.png" alt="Mitrais" style={{ width: '120px' }} />
+          <Divider>Welcome to Mitrais</Divider>
+          <Form layout="vertical" name="register" initialValues={{ remember: true }} onFinish={this.onFinish}>
+
+            <Button type="primary" htmlType="submit" block onClick={() => this.props.switchToPage('login')}>
+              Logout
+            </Button>
+            &nbsp;
+            </Form>
         </div>
       </Col>
     )
