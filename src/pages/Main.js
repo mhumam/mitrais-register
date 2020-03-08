@@ -70,7 +70,7 @@ class SignUp extends Component {
     /* callback switch page */
     const callback = () => { this.props.switchPage() }
 
-    await axios.post('http://localhost:4000/api/register ', { ...values })
+    await axios.post('https://apimitrais.herokuapp.com/api/register', { ...values })
       .then(function (response) {
         const { status } = response.data;
         openNotificationWithIcon('success', 'Success', status.message);
@@ -121,14 +121,14 @@ class SignUp extends Component {
               </Form.Item>
               <Form.Item label="Email" name="email" rules={[
                 { required: true, message: 'Please input your email!' },
-                { type: 'email', message: 'asdasd' }
+                { type: 'email', message: 'Format email invalid' }
               ]} >
                 <Input placeholder="Email" />
               </Form.Item>
               <Button type="primary" htmlType="submit" block className="btn-mitrais">
                 Register
               </Button>
-              <br />
+              &nbsp;
               <Button htmlType="button" block className="btn-mitrais">
                 Back
               </Button>
